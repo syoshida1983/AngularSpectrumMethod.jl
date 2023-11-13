@@ -29,13 +29,13 @@ v = ASM(u, λ, Δx, Δy, z; expand=true)
 > The x-axis is the horizontal direction, and the y-axis is the vertical.
 
 <p align="center">
-    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/rect.jpg" width="400px">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/rect.jpg" width="250px">
     &emsp;&emsp;
-    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ASM50mm.jpg" width="400px">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ASM50mm.jpg" width="250px">
     <br>
-    &emsp;&emsp;
+    &emsp;&emsp;&emsp;
     input field
-    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
     diffracted field by ASM
 </p>
 
@@ -50,14 +50,14 @@ BandLimitedASM(u, λ, Δx, Δy, z; expand=true)
 > 1. [Kyoji Matsushima and Tomoyoshi Shimobaba, "Band-Limited Angular Spectrum Method for Numerical Simulation of Free-Space Propagation in Far and Near Fields," Opt. Express **17**, 19662-19673 (2009) ](https://doi.org/10.1364/OE.17.019662)
 
 <p align="center">
-    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ASM5m.jpg" width="400px">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ASM5m.jpg" width="250px">
     &emsp;&emsp;
-    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/BandLimitedASM.jpg" width="400px">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/BandLimitedASM.jpg" width="250px">
     <br>
-    diffracted field by ASM with a long propagation distance
-    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    ASM with a long propagation distance
+    &emsp;&emsp;&emsp;&emsp;&emsp;
     Band-limited ASM
-    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    &emsp;&emsp;&emsp;&emsp;&emsp;
 </p>
 
 ## Scaled ASM
@@ -71,14 +71,14 @@ ScaledASM(u, λ, Δx, Δy, z, R; expand=true)
 > 2. [Tomoyoshi Shimobaba, Kyoji Matsushima, Takashi Kakue, Nobuyuki Masuda, and Tomoyoshi Ito, "Scaled angular spectrum method," Opt. Lett. **37**, 4128-4130 (2012)](https://doi.org/10.1364/OL.37.004128)
 
 <p align="center">
-    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ScaledASMx2.jpg" width="400px">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ScaledASMx2.jpg" width="250px">
     &emsp;&emsp;
-    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ScaledASMx0.5.jpg" width="400px">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ScaledASMx0.5.jpg" width="250px">
     <br>
-    diffracted field by Scaled ASM with R = 2.0
-    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    Scaled ASM with R = 2.0
+    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
     R = 0.5
-    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    &emsp;&emsp;&emsp;
 </p>
 
 ## Shifted ASM
@@ -92,13 +92,13 @@ ShiftedASM(u, λ, Δx, Δy, z, x₀, y₀; expand=true)
 > 3. [Kyoji Matsushima, "Shifted angular spectrum method for off-axis numerical propagation," Opt. Express **18**, 18453-18463 (2010)](https://doi.org/10.1364/OE.18.018453)
 
 <p align="center">
-    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ASM50mm.jpg" width="400px">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ASM50mm.jpg" width="250px">
     &emsp;&emsp;
-    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ShiftedASM.jpg" width="400px">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ShiftedASM.jpg" width="250px">
     <br>
-    &emsp;&emsp;
-    diffracted field by ASM
-    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    ASM
+    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
     Shifted ASM with x direction shift
 </p>
 
@@ -120,12 +120,12 @@ TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
 > [Rotations.jl](https://github.com/JuliaGeometry/Rotations.jl) is helpful in generating rotation matrices.
 
 <p align="center">
-    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/rect.jpg" width="400px">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/rect.jpg" width="250px">
     &emsp;&emsp;
-    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/TiltedASM.jpg" width="400px">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/TiltedASM.jpg" width="250px">
     <br>
-    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
     input field
-    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-    diffracted field by Tilted ASM with rotation around the x-axis
+    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    Tilted ASM with rotation around the x-axis
 </p>
