@@ -33,16 +33,16 @@ return shifted diffraction field with the shift distance ``x_{0}`` and ``y_{0}``
 """
 function ShiftedASM(u, λ, Δx, Δy, z, x₀, y₀; expand=true)
     û = ifelse(expand, ifftshift(fft(fftshift(padzeros(u)))), ifftshift(fft(fftshift(u))))
-    N₁, N₂ = size(û)
-    r₀ = [x₀, y₀]
-    S = [N₁*Δx/2, N₂*Δy/2]              # size of source sampling window
+    Ny, Nx = size(û)                    # row and column directions are x- and y-axis, respectively
+    r₀ = [y₀, x₀]
+    S = [Ny*Δy/2, Nx*Δx/2]              # size of source sampling window
     v₊ = @. 1/(λ*√(z^2/(r₀ + S)^2 + 1)) # upper limit of bandwidth
     v₋ = @. 1/(λ*√(z^2/(r₀ - S)^2 + 1)) # lower limit of bandwidth
     v₀ = CenterFrequency.(r₀, S, v₊, v₋)
     vw = BandWidth.(r₀, S, v₊, v₋)
 
-    @fastmath @inbounds for j ∈ 1:N₂, i ∈ 1:N₁
-        v = [(i - 1 - N₁/2)/(N₁*Δx), (j - 1 - N₂/2)/(N₂*Δy)]    # spatial frequency u, v
+    @fastmath @inbounds for j ∈ 1:Nx, i ∈ 1:Ny
+        v = [(i - 1 - Ny/2)/(Ny*Δy), (j - 1 - Nx/2)/(Nx*Δx)]    # spatial frequency u, v
         w = √(1/λ^2 - v⋅v + 0im)                                # spatial frequency w
         û[i, j] *= exp(2π*im*(r₀⋅v + z*w))*prod(rect.((v .- v₀)./vw))
     end

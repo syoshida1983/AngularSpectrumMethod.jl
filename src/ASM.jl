@@ -16,14 +16,14 @@ Without attenuation, the total energy ``\\iint|u|\\mathrm{d}x\\mathrm{d}y`` is c
 - `expand=true`: if true (default), perform 4× expansion and zero padding for aliasing suppression.
 
 !!! note
-    The x-axis is the first (column) direction, and the y-axis is the second (row).
+    The x-axis is the horizontal direction, and the y-axis is the vertical.
 """
 function ASM(u, λ, Δx, Δy, z; expand=true)
     û = ifelse(expand, ifftshift(fft(fftshift(padzeros(u)))), ifftshift(fft(fftshift(u))))
-    N₁, N₂ = size(û)
+    Ny, Nx = size(û)    # row and column directions are x- and y-axis, respectively
 
-    @fastmath @inbounds for j ∈ 1:N₂, i ∈ 1:N₁
-        v = [(i - 1 - N₁/2)/(N₁*Δx), (j - 1 - N₂/2)/(N₂*Δy)]    # spatial frequency u, v
+    @fastmath @inbounds for j ∈ 1:Nx, i ∈ 1:Ny
+        v = [(i - 1 - Ny/2)/(Ny*Δy), (j - 1 - Nx/2)/(Nx*Δx)]    # spatial frequency u, v
         w = √(1/λ^2 - v⋅v + 0im)                                # spatial frequency w
         û[i, j] *= exp(2π*im*z*w)
     end

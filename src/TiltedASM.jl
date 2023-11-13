@@ -15,8 +15,8 @@ In this case, the energy conservation improves, but the computational cost is hi
 > 3. [James G. Pipe and Padmanabhan Menon, "Sampling density compensation in MRI: Rationale and an iterative numerical solution," Magn. Reson. Med. **41**, 179-186 (1999)](https://doi.org/10.1002/(sici)1522-2594(199901)41:1%3C179::aid-mrm25%3E3.0.co;2-v)
 """
 function TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
-    û = ifelse(expand, ifftshift(fft(fftshift(padzeros(u)))), ifftshift(fft(fftshift(u))))
-    N₁, N₂ = size(û)
+    û = ifelse(expand, ifftshift(fft(fftshift(padzeros(transpose(u))))), ifftshift(fft(fftshift(transpose(u)))))
+    Nx, Ny = size(û)                            # Note that the array is transposed for consistency with the rotation matrix
     v̂₀ = (T*[0, 0, 1/λ])[1:2]                   # carrier frequency û₀, v̂₀ in the reference plane
     k̂ = Matrix{Float64}(undef, 2, length(û))    # frequency nodes in the reference plane
     f̂ = Vector{ComplexF64}(undef, length(û))    # spectrum data
@@ -26,8 +26,8 @@ function TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
         T[1]*T[5] - T[4]*T[2]]
     n = 0
 
-    @fastmath @inbounds for j ∈ 1:N₂, i ∈ 1:N₁
-        v = [(i - 1 - N₁/2)/(N₁*Δx), (j - 1 - N₂/2)/(N₂*Δy)]    # spatial frequency u, v in the source plane
+    @fastmath @inbounds for j ∈ 1:Ny, i ∈ 1:Nx
+        v = [(i - 1 - Nx/2)/(Nx*Δx), (j - 1 - Ny/2)/(Ny*Δy)]    # spatial frequency u, v in the source plane
         w² = 1/λ^2 - v⋅v                                        # squared spatial frequency w² in the source plane
 
         # ignore evanescent wave
@@ -59,10 +59,10 @@ function TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
     end
 
     # superposition of carrier wave
-    @inbounds @fastmath for j ∈ 1:N₂, i ∈ 1:N₁
-        r = [(i - 1 - N₁/2)*Δx, (j - 1 - N₂/2)*Δy]
+    @inbounds @fastmath for j ∈ 1:Ny, i ∈ 1:Nx
+        r = [(i - 1 - Nx/2)*Δx, (j - 1 - Ny/2)*Δy]
         f[i, j] *= exp(2π*im*v̂₀⋅r)
     end
 
-    return ifelse(expand, crop(f), f)
+    return transpose(ifelse(expand, crop(f), f))
 end

@@ -9,18 +9,18 @@ return scaled diffraction field according to the scale factor ``R`` by the scale
 """
 function ScaledASM(u, λ, Δx, Δy, z, R; expand=true)
     û::Matrix{ComplexF64} = ifelse(expand, padzeros(u), u)
-    N₁, N₂ = size(û)
+    Ny, Nx = size(û)                                                            # row and column directions are x- and y-axis, respectively
     S = ifelse(abs(R) ≤ 1, R, 1/R)                                              # scale factor
     k = vcat(                                                                   # nodes for NFFT
-        repeat(Vector(range(-1/2, 1/2, length=N₁)).*S, N₂)',                        # x
-        repeat(Vector(range(-1/2, 1/2, length=N₂)).*S, inner=N₁)')                  # y
-    J = ifelse(abs(R) ≤ 1, abs(R)/(N₁*N₂), 1/abs(R))                            # Jacobian for energy conservation
+        repeat(Vector(range(-1/2, 1/2, length=Ny)).*S, Nx)',                        # x
+        repeat(Vector(range(-1/2, 1/2, length=Nx)).*S, inner=Ny)')                  # y
+    J = ifelse(abs(R) ≤ 1, abs(R)/(Nx*Ny), 1/abs(R))                            # Jacobian for energy conservation
     û = ifelse(abs(R) ≤ 1,                                                      # F[u]
             ifftshift(fft(fftshift(û))),                                            # scale down
             conj.(nfft_adjoint(k, size(û), conj.(û[:]))::Matrix{ComplexF64}))       # scale up
 
-    @fastmath @inbounds for j ∈ 1:N₂, i ∈ 1:N₁
-        v = [(i - 1 - N₁/2)/(N₁*Δx), (j - 1 - N₂/2)/(N₂*Δy)]    # spatial frequency u, v
+    @fastmath @inbounds for j ∈ 1:Nx, i ∈ 1:Ny
+        v = [(i - 1 - Ny/2)/(Ny*Δy), (j - 1 - Nx/2)/(Nx*Δx)]    # spatial frequency u, v
         w = √(1/λ^2 - v⋅v + 0im)                                # spatial frequency w
         û[i, j] *= J*exp(2π*im*z*w)
     end
