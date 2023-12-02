@@ -7,6 +7,29 @@
 This package provides the functions for diffraction calculations based on the angular spectrum method (ASM).
 In addition to the standard diffraction calculation with ASM, various diffraction calculations with band-limited, scaled, shifted, and tilted ASM are available.
 
+# Installation
+
+To install this package, open the Julia REPL and run
+
+```julia
+julia> ]add AngularSpectrumMethod
+```
+
+or
+
+```julia
+julia> using Pkg
+julia> Pkg.add("AngularSpectrumMethod")
+```
+
+# Usage
+
+Import the package first.
+
+```julia
+julia> using AngularSpectrumMethod
+```
+
 ## ASM
 
 The function `ASM` returns the diffracted field by the angular spectrum method (ASM).
@@ -14,7 +37,7 @@ Evanescent waves are not eliminated but attenuated as $\exp(-2{\pi}wz)$.
 Without attenuation, the total energy $\iint|u|\mathrm{d}x\mathrm{d}y$ is conserved.
 
 ```julia
-v = ASM(u, λ, Δx, Δy, z; expand=true)
+julia> v = ASM(u, λ, Δx, Δy, z; expand=true)
 ```
 
 ### Arguments
@@ -44,7 +67,7 @@ v = ASM(u, λ, Δx, Δy, z; expand=true)
 The function `BandLimitedASM` returns a diffracted field by the band-limited ASM (see Ref. 1).
 
 ```julia
-v = BandLimitedASM(u, λ, Δx, Δy, z; expand=true)
+julia> v = BandLimitedASM(u, λ, Δx, Δy, z; expand=true)
 ```
 
 > 1. [Kyoji Matsushima and Tomoyoshi Shimobaba, "Band-Limited Angular Spectrum Method for Numerical Simulation of Free-Space Propagation in Far and Near Fields," Opt. Express **17**, 19662-19673 (2009) ](https://doi.org/10.1364/OE.17.019662)
@@ -65,7 +88,7 @@ v = BandLimitedASM(u, λ, Δx, Δy, z; expand=true)
 The function `ScaledASM` returns a scaled diffraction field according to the scale factor $R$ by the scaled ASM (see Ref. 2).
 
 ```julia
-v = ScaledASM(u, λ, Δx, Δy, z, R; expand=true)
+julia> v = ScaledASM(u, λ, Δx, Δy, z, R; expand=true)
 ```
 
 > 2. [Tomoyoshi Shimobaba, Kyoji Matsushima, Takashi Kakue, Nobuyuki Masuda, and Tomoyoshi Ito, "Scaled angular spectrum method," Opt. Lett. **37**, 4128-4130 (2012)](https://doi.org/10.1364/OL.37.004128)
@@ -86,7 +109,7 @@ v = ScaledASM(u, λ, Δx, Δy, z, R; expand=true)
 The function `ShiftedASM` returns a shifted diffraction field with the shift distance $x_{0}$ and $y_{0}$ by the shifted ASM (see Ref. 3).
 
 ```julia
-v = ShiftedASM(u, λ, Δx, Δy, z, x₀, y₀; expand=true)
+julia> v = ShiftedASM(u, λ, Δx, Δy, z, x₀, y₀; expand=true)
 ```
 
 > 3. [Kyoji Matsushima, "Shifted angular spectrum method for off-axis numerical propagation," Opt. Express **18**, 18453-18463 (2010)](https://doi.org/10.1364/OE.18.018453)
@@ -109,7 +132,7 @@ If `weight=true`, a diagonal weighting matrix is used as the Jacobian determinan
 In this case, the energy conservation improves, but the computational cost is high (see Ref. 6).
 
 ```julia
-v = TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
+julia> v = TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
 ```
 
 > 4. [Kyoji Matsushima, Hagen Schimmel, and Frank Wyrowski, "Fast calculation method for optical diffraction on tilted planes by use of the angular spectrum of plane waves," J. Opt. Soc. Am. A **20**, 1755-1762 (2003)](https://doi.org/10.1364/JOSAA.20.001755)
