@@ -1,4 +1,5 @@
 export ASM
+export ASM!
 
 """
     ASM(u, λ, Δx, Δy, z; expand=true)
@@ -19,14 +20,20 @@ Without attenuation, the total energy ``\\iint|u|\\mathrm{d}x\\mathrm{d}y`` is c
     The x-axis is the horizontal direction, and the y-axis is the vertical.
 """
 function ASM(u, λ, Δx, Δy, z; expand=true)
-    û = ifelse(expand, ifftshift(fft(fftshift(padzeros(u)))), ifftshift(fft(fftshift(u))))
-    Ny, Nx = size(û)    # row and column directions are x- and y-axis, respectively
+    N = ifelse(expand, size(u).*2, size(u)) # row and column directions are x- and y-axis, respectively
+    ν = fftfreq.(N, inv.([Δy, Δx]))         # spatial frequencies (DC corner)
+    H = @. exp(2π*im*z*√(1/λ^2 - ν[1]^2 - ν[2]'^2 + 0im))   # transfer function
+    ũ = select_region_view(u, new_size=N)
+    û = fftshift(ifft(fft(ifftshift(ũ)).*H))
 
-    @fastmath @inbounds for j ∈ 1:Nx, i ∈ 1:Ny
-        v = [(i - 1 - Ny/2)/(Ny*Δy), (j - 1 - Nx/2)/(Nx*Δx)]    # spatial frequency u, v
-        w = √(1/λ^2 - v⋅v + 0im)                                # spatial frequency w
-        û[i, j] *= exp(2π*im*z*w)
-    end
+    return select_region_view(û, new_size=size(u))
+end
 
-    return ifelse(expand, crop(ifftshift(ifft(fftshift(û)))), ifftshift(ifft(fftshift(û))))
+"""
+    ASM!(u, λ, Δx, Δy, z; expand=true)
+
+Same as ASM, but operates in-place on u, which must be an array of complex floating-point numbers.
+"""
+function ASM!(u, λ, Δx, Δy, z; expand=true)
+    u[:,:] = ASM(u, λ, Δx, Δy, z; expand)
 end

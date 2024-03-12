@@ -1,4 +1,5 @@
 export TiltedASM
+export TiltedASM!
 
 """
     TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
@@ -15,54 +16,47 @@ In this case, the energy conservation improves, but the computational cost is hi
 > 3. [James G. Pipe and Padmanabhan Menon, "Sampling density compensation in MRI: Rationale and an iterative numerical solution," Magn. Reson. Med. **41**, 179-186 (1999)](https://doi.org/10.1002/(sici)1522-2594(199901)41:1%3C179::aid-mrm25%3E3.0.co;2-v)
 """
 function TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
-    û = ifelse(expand, ifftshift(fft(fftshift(padzeros(transpose(u))))), ifftshift(fft(fftshift(transpose(u)))))
-    Nx, Ny = size(û)                            # Note that the array is transposed for consistency with the rotation matrix
-    v̂₀ = (T*[0, 0, 1/λ])[1:2]                   # carrier frequency û₀, v̂₀ in the reference plane
-    k̂ = Matrix{Float64}(undef, 2, length(û))    # frequency nodes in the reference plane
-    f̂ = Vector{ComplexF64}(undef, length(û))    # spectrum data
-    J = Vector{Float64}(undef, length(û))       # Jacobian determinant
-    a = [T[4]*T[8] - T[7]*T[5],                 # for Jacobian calculation
-        T[7]*T[2] - T[1]*T[8],
-        T[1]*T[5] - T[4]*T[2]]
-    n = 0
+    N = ifelse(expand, size(u').*2, size(u'))   # Note that the array is transposed for consistency with the rotation matrix
+    Δ = [Δx, Δy]
+    ν = fftfreq.(N, inv.(Δ))            # spatial frequencies νx, νy (DC corner) in the source plane
+    νz² = @. 1/λ^2 - ν[1]^2 - ν[2]'^2   # squared spatial frequency νz²
+    ν̂₀ = T*[0, 0, 1/λ]                  # carrier frequency in the reference plane
+    ũ = select_region(transpose(u), new_size=N)
+    û = fft(ifftshift(ũ))
+    i = νz²[:] .> 0                 # valid indices
+    f̂ = û[i]                        # spectrum data
+    ν̃ = [repeat(ν[1], N[2])[i]';    # spatial frequencies in the source plane
+        repeat(ν[2], inner=N[1])[i]';
+        .√(νz²[i])']
+    ν̂ = T*ν̃ .- ν̂₀               # spatial frequencies in the reference plane
+    k̂ = ν̂[1:2,:].*Δ             # frequency node
+    k̂ = @. k̂ - floor(k̂ + 1/2)   # periodic boundary [-1/2, 1/2)
+    p = plan_nfft(k̂, N)::NFFTPlan{Float64, 2, 1}
 
-    @fastmath @inbounds for j ∈ 1:Ny, i ∈ 1:Nx
-        v = [(i - 1 - Nx/2)/(Nx*Δx), (j - 1 - Ny/2)/(Ny*Δy)]    # spatial frequency u, v in the source plane
-        w² = 1/λ^2 - v⋅v                                        # squared spatial frequency w² in the source plane
-
-        # ignore evanescent wave
-        if w² < 0
-            continue
-        end
-
-        append!(v, √(w²))
-        v̂ = (T*v)[1:2] - v̂₀    # spatial frequency û, v̂ in the reference plane
-        t̂ = v̂.*[Δx, Δy]        # frequency node
-
-        # bounds checking of nodes
-        if true ∈ (@. abs(t̂) > 1/2)
-            continue
-        end
-
-        n += 1
-        append!(v̂, √(1/λ^2 - v̂⋅v̂))
-        f̂[n] = û[i, j]
-        J[n] = √(a⋅[v̂[1]/v̂[3], v̂[2]/v̂[3], 1])   # Jacobian determinant
-        k̂[:, n] = t̂
-    end
-
-    p = plan_nfft((@view k̂[:, 1:n]), size(û))::NFFTPlan{Float64, 2, 1}
     if weight
-        f = adjoint(p)*((@view f̂[1:n]).*sqrt.(sdc(p, iters=10)./n))
+        û = adjoint(p)*(f̂.*sqrt.(sdc(p, iters=10)./length(f̂)))
     else
-        f = adjoint(p)*((@view f̂[1:n]).*(@view J[1:n])./n)
+        # Jacobian determinant
+        ν̂[3,:] .= @. √(1/λ^2 - ν̂[1,:]^2 - ν̂[2,:]^2)
+        j = [T[4]*T[8] - T[7]*T[5],
+            T[7]*T[2] - T[1]*T[8],
+            T[1]*T[5] - T[4]*T[2]]
+        J = .√([ν̂[1,:]./ν̂[3,:] ν̂[2,:]./ν̂[3,:] ones(eltype(ν̂), length(f̂), 1)]*j)
+        û = adjoint(p)*(f̂.*J./length(f̂))
     end
 
-    # superposition of carrier wave
-    @inbounds @fastmath for j ∈ 1:Ny, i ∈ 1:Nx
-        r = [(i - 1 - Nx/2)*Δx, (j - 1 - Ny/2)*Δy]
-        f[i, j] *= exp(2π*im*v̂₀⋅r)
-    end
+    # superposition of carrier wave (positive directions of the coordinates are right and up)
+    f = select_region(transpose(û), new_size=size(u))
+    r = fftshift.(fftfreq.(size(u), size(u).*[-Δy, Δx]))
 
-    return transpose(ifelse(expand, crop(f), f))
+    return @. f*exp(2π*im*(ν̂₀[2]*r[1] + ν̂₀[1]*r[2]'))
+end
+
+"""
+    TiltedASM!(u, λ, Δx, Δy, T; expand=true, weight=false)
+
+Same as TiltedASM, but operates in-place on u, which must be an array of complex floating-point numbers.
+"""
+function TiltedASM!(u, λ, Δx, Δy, T; expand=true, weight=false)
+    u[:,:] = TiltedASM(u, λ, Δx, Δy, T; expand, weight)
 end
