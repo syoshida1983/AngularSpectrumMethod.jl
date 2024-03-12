@@ -5,7 +5,8 @@
 [![Build Status](https://github.com/syoshida1983/AngularSpectrumMethod.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/syoshida1983/AngularSpectrumMethod.jl/actions/workflows/CI.yml?query=branch%3Amaster)
 
 This package provides the functions for diffraction calculations based on the angular spectrum method (ASM).
-In addition to the standard diffraction calculation with ASM, various diffraction calculations with band-limited, scaled, shifted, and tilted ASM are available.
+In addition to the standard diffraction calculation with ASM, various diffraction calculations with band-limited, scalable, scaled, shifted, and tilted ASM are available.
+In-place versions of each function are also provided. When using the in-place version functions, append an `!` to the end of each function name.
 
 # Installation
 
@@ -83,15 +84,38 @@ julia> v = BandLimitedASM(u, λ, Δx, Δy, z; expand=true)
     &emsp;&emsp;&emsp;&emsp;&emsp;
 </p>
 
+## Scalable ASM
+
+The function `ScalableASM` returns automatically scaled diffraction field by the scalable ASM (see Ref. 2).
+The sampling pitch in the destination plane $\Delta_{d}$ is $\Delta_{d}=\dfrac{\lambda z}{pN\Delta_{s}}$,
+where $\Delta_{s}$ is the sampling pitch in the source plane, $N$ is the number of pixels in the source or destination plane, and $p=2$ is the padding factor.
+
+```julia
+julia> v = ScalableASM(u, λ, Δx, Δy, z; expand=true)
+```
+
+> 2. [Rainer Heintzmann, Lars Loetgering, and Felix Wechsler, "Scalable angular spectrum propagation," Optica **10**, 1407-1416 (2023)](https://doi.org/10.1364/OPTICA.497809)
+
+<p align="center">
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/rect.jpg" width="250px">
+    &emsp;&emsp;
+    <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ScalableASM.jpg" width="250px">
+    <br>
+    &emsp;&emsp;&emsp;&emsp;&emsp;
+    input field
+    &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    diffracted field by Scalable ASM
+</p>
+
 ## Scaled ASM
 
-The function `ScaledASM` returns a scaled diffraction field according to the scale factor $R$ by the scaled ASM (see Ref. 2).
+The function `ScaledASM` returns a scaled diffraction field according to the scale factor $R$ by the scaled ASM (see Ref. 3).
 
 ```julia
 julia> v = ScaledASM(u, λ, Δx, Δy, z, R; expand=true)
 ```
 
-> 2. [Tomoyoshi Shimobaba, Kyoji Matsushima, Takashi Kakue, Nobuyuki Masuda, and Tomoyoshi Ito, "Scaled angular spectrum method," Opt. Lett. **37**, 4128-4130 (2012)](https://doi.org/10.1364/OL.37.004128)
+> 3. [Tomoyoshi Shimobaba, Kyoji Matsushima, Takashi Kakue, Nobuyuki Masuda, and Tomoyoshi Ito, "Scaled angular spectrum method," Opt. Lett. **37**, 4128-4130 (2012)](https://doi.org/10.1364/OL.37.004128)
 
 <p align="center">
     <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ScaledASMx2.jpg" width="250px">
@@ -106,13 +130,13 @@ julia> v = ScaledASM(u, λ, Δx, Δy, z, R; expand=true)
 
 ## Shifted ASM
 
-The function `ShiftedASM` returns a shifted diffraction field with the shift distance $x_{0}$ and $y_{0}$ by the shifted ASM (see Ref. 3).
+The function `ShiftedASM` returns a shifted diffraction field with the shift distance $x_{0}$ and $y_{0}$ by the shifted ASM (see Ref. 4).
 
 ```julia
 julia> v = ShiftedASM(u, λ, Δx, Δy, z, x₀, y₀; expand=true)
 ```
 
-> 3. [Kyoji Matsushima, "Shifted angular spectrum method for off-axis numerical propagation," Opt. Express **18**, 18453-18463 (2010)](https://doi.org/10.1364/OE.18.018453)
+> 4. [Kyoji Matsushima, "Shifted angular spectrum method for off-axis numerical propagation," Opt. Express **18**, 18453-18463 (2010)](https://doi.org/10.1364/OE.18.018453)
 
 <p align="center">
     <img src="https://github.com/syoshida1983/AngularSpectrumMethod.jl/blob/images/ASM50mm.jpg" width="250px">
@@ -127,17 +151,17 @@ julia> v = ShiftedASM(u, λ, Δx, Δy, z, x₀, y₀; expand=true)
 
 ## Tilted ASM
 
-The function `TiltedASM` returns a tilted diffraction field for a rotation matrix $T$ by the tilted ASM (see Ref. 4, 5).
+The function `TiltedASM` returns a tilted diffraction field for a rotation matrix $T$ by the tilted ASM (see Ref. 5, 6).
 If `weight=true`, a diagonal weighting matrix is used as the Jacobian determinant (default `false`).
-In this case, the energy conservation improves, but the computational cost is high (see Ref. 6).
+In this case, the energy conservation improves, but the computational cost is high (see Ref. 7).
 
 ```julia
 julia> v = TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
 ```
 
-> 4. [Kyoji Matsushima, Hagen Schimmel, and Frank Wyrowski, "Fast calculation method for optical diffraction on tilted planes by use of the angular spectrum of plane waves," J. Opt. Soc. Am. A **20**, 1755-1762 (2003)](https://doi.org/10.1364/JOSAA.20.001755)
-> 5. [Kyoji Matsushima, "Formulation of the rotational transformation of wave fields and their application to digital holography," Appl. Opt. **47**, D110-D116 (2008)](https://doi.org/10.1364/AO.47.00D110)
-> 6. [James G. Pipe and Padmanabhan Menon, "Sampling density compensation in MRI: Rationale and an iterative numerical solution," Magn. Reson. Med. **41**, 179-186 (1999)](https://doi.org/10.1002/(sici)1522-2594(199901)41:1%3C179::aid-mrm25%3E3.0.co;2-v)
+> 5. [Kyoji Matsushima, Hagen Schimmel, and Frank Wyrowski, "Fast calculation method for optical diffraction on tilted planes by use of the angular spectrum of plane waves," J. Opt. Soc. Am. A **20**, 1755-1762 (2003)](https://doi.org/10.1364/JOSAA.20.001755)
+> 6. [Kyoji Matsushima, "Formulation of the rotational transformation of wave fields and their application to digital holography," Appl. Opt. **47**, D110-D116 (2008)](https://doi.org/10.1364/AO.47.00D110)
+> 7. [James G. Pipe and Padmanabhan Menon, "Sampling density compensation in MRI: Rationale and an iterative numerical solution," Magn. Reson. Med. **41**, 179-186 (1999)](https://doi.org/10.1002/(sici)1522-2594(199901)41:1%3C179::aid-mrm25%3E3.0.co;2-v)
 
 > [!NOTE]
 > [Rotations.jl](https://github.com/JuliaGeometry/Rotations.jl) is helpful in generating rotation matrices.
