@@ -47,7 +47,7 @@ function TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
 
     # superposition of carrier wave (positive directions of the coordinates are right and up)
     f = select_region(transpose(û), new_size=size(u))
-    r = fftshift.(fftfreq.(size(u), size(u).*[-Δy, Δx]))
+    r = fftshift.(fftfreq.(size(u), size(u).*[Δy, -Δx]))
 
     return @. f*exp(2π*im*(ν̂₀[2]*r[1] + ν̂₀[1]*r[2]'))
 end
