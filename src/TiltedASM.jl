@@ -23,11 +23,9 @@ function TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
     ν̂₀ = T*[0, 0, 1/λ]                  # carrier frequency in the reference plane
     ũ = select_region(transpose(u), new_size=N)
     û = fft(ifftshift(ũ))
-    i = νz²[:] .> 0                 # valid indices
-    f̂ = û[i]                        # spectrum data
-    ν̃ = [repeat(ν[1], N[2])[i]';    # spatial frequencies in the source plane
-        repeat(ν[2], inner=N[1])[i]';
-        .√(νz²[i])']
+    i = findall(==(true), νz²[:] .> 0)  # valid indices
+    f̂ = û[i]                            # spectrum data
+    ν̃ = [ν[1][@. (i - 1)%N[1] + 1]'; ν[2][@. (i - 1)÷N[1] + 1]'; .√(νz²[i])']   # spatial frequencies in the source plane
     ν̂ = T*ν̃ .- ν̂₀               # spatial frequencies in the reference plane
     k̂ = ν̂[1:2,:].*Δ             # frequency node
     k̂ = @. k̂ - floor(k̂ + 1/2)   # periodic boundary [-1/2, 1/2)

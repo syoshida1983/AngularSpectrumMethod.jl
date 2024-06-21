@@ -1,7 +1,7 @@
 name = "AngularSpectrumMethod"
 uuid = "34f41046-6bdb-4a9c-a4a9-19e45b4e2d17"
 authors = ["Shuhei Yoshida <yshuhei@ele.kindai.ac.jp> and contributors"]
-version = "0.2.2"
+version = "0.2.3"
 
 [deps]
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
@@ -12,7 +12,7 @@ NFFTTools = "7424e34d-94f7-41d6-98a0-85abaf1b6c91"
 
 [compat]
 FFTW = "1.7.1, 1.8.0"
-NDTools = "0.5.3"
+NDTools = "0.5.3, 0.6.0"
 NFFT = "0.13.3"
 NFFTTools = "0.2.6"
 julia = "1.6, 1.7, 1.8, 1.9, 1.10"
