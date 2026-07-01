@@ -87,8 +87,10 @@ julia> v = BandLimitedASM(u, λ, Δx, Δy, z; expand=true)
 ## Scalable ASM
 
 The function `ScalableASM` returns automatically scaled diffraction field by the scalable ASM (see Ref. 2).
-The sampling pitch in the destination plane $\Delta_{d}$ is $\Delta_{d}=\dfrac{\lambda z}{pN\Delta_{s}}$,
-where $\Delta_{s}$ is the sampling pitch in the source plane, $N$ is the number of pixels in the source or destination plane, and $p=2$ is the padding factor.
+The sampling interval in the destination plane $\Delta_{d}$ is $\Delta_{d}=\dfrac{\lambda z}{pN\Delta_{s}}$,
+where $\Delta_{s}$ is the sampling interval in the source plane, $N$ is the number of pixels in the source or destination plane, and $p=2$ is the padding factor.
+If the diffraction distance ``z`` is negative, backpropagation is performed,
+i.e. diffracting at positive ``z`` and then diffracting at negative ``z``, the field returns to its original state.
 
 ```julia
 julia> v = ScalableASM(u, λ, Δx, Δy, z; expand=true)
