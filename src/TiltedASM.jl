@@ -16,22 +16,22 @@ In this case, the energy conservation improves, but the computational cost is hi
 > 3. [James G. Pipe and Padmanabhan Menon, "Sampling density compensation in MRI: Rationale and an iterative numerical solution," Magn. Reson. Med. **41**, 179-186 (1999)](https://doi.org/10.1002/(sici)1522-2594(199901)41:1%3C179::aid-mrm25%3E3.0.co;2-v)
 """
 function TiltedASM(u, λ, Δx, Δy, T; expand=true, weight=false)
-    N = ifelse(expand, size(u').*2, size(u'))   # Note that the array is transposed for consistency with the rotation matrix
-    Δ = [Δx, Δy]
-    ν = fftfreq.(N, inv.(Δ))            # spatial frequencies νx, νy (DC corner) in the source plane
+    N   = ifelse(expand, size(u').*2, size(u')) # Note that the array is transposed for consistency with the rotation matrix
+    Δ   = [Δx, Δy]
+    ν   = fftfreq.(N, inv.(Δ))          # spatial frequencies νx, νy (DC corner) in the source plane
     νz² = @. 1/λ^2 - ν[1]^2 - ν[2]'^2   # squared spatial frequency νz²
-    ν̂₀ = T*[0, 0, 1/λ]                  # carrier frequency in the reference plane
-    ũ = select_region(transpose(u), new_size=N)
-    û = fft(ifftshift(ũ))
-    i = findall(==(true), (@view νz²[:]) .> 0)  # valid indices
-    f̂ = @view û[i]                      # spectrum data
-    ν̃ = @. [(@view ν[1][(i-1)%N[1]+1])';
+    ν̂₀  = T*[0, 0, 1/λ]                 # carrier frequency in the reference plane
+    ũ   = select_region(transpose(u), new_size=N)
+    û   = fft(ifftshift(ũ))
+    i   = findall(==(true), (@view νz²[:]) .> 0)    # valid indices
+    f̂   = @view û[i]                    # spectrum data
+    ν̃   = @. [(@view ν[1][(i-1)%N[1]+1])';
             (@view ν[2][(i-1)÷N[1]+1])';
             √(@view νz²[i])']   # spatial frequencies in the source plane
-    ν̂ = T*ν̃ .- ν̂₀               # spatial frequencies in the reference plane
-    k̂ = (@view ν̂[1:2,:]).*Δ     # frequency node
-    k̂ = @. k̂ - floor(k̂ + 1/2)   # periodic boundary [-1/2, 1/2)
-    p = plan_nfft(k̂, N)::NFFTPlan{Float64, 2, 1}
+    ν̂   = T*ν̃ .- ν̂₀             # spatial frequencies in the reference plane
+    k̂   = (@view ν̂[1:2,:]).*Δ   # frequency node
+    k̂   = @. k̂ - floor(k̂ + 1/2) # periodic boundary [-1/2, 1/2)
+    p   = plan_nfft(k̂, N)::NFFTPlan{Float64, 2, 1}
 
     if weight
         û = adjoint(p)*(f̂.*sqrt.(sdc(p, iters=10)./length(f̂)))
@@ -55,7 +55,7 @@ end
 """
     TiltedASM!(u, λ, Δx, Δy, T; expand=true, weight=false)
 
-Same as TiltedASM, but operates in-place on u, which must be an array of complex floating-point numbers.
+Same as TiltedASM, but operates in-place on `u`, which must be an array of complex floating-point numbers.
 """
 function TiltedASM!(u, λ, Δx, Δy, T; expand=true, weight=false)
     u[:,:] = TiltedASM(u, λ, Δx, Δy, T; expand, weight)
